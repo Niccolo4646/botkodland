@@ -74,9 +74,7 @@ async def modificaPoints(ctx, nuovo_punteggio):
     with open('textPoints.txt', 'w') as f:
         for riga in righe:
             if str(ctx.author.id) in riga:
-                split = riga.split("=")
-                id = str(split[0].strip())
-                nuovaRiga = f"{id} = {nuovo_punteggio}\n"
+                nuovaRiga = f"{str(ctx.author.id)} = {nuovo_punteggio}\n"
                 f.write(nuovaRiga)
                 trovato = True
             else:
@@ -85,14 +83,28 @@ async def modificaPoints(ctx, nuovo_punteggio):
     if trovato:
         await ctx.send(f'Punteggio aggiornato a {nuovo_punteggio}')
     else:
-        await ctx.send('ID utente non trovato nel file!')
+        await ctx.send('Non sei presente nel database! Usa il coamndo `$aggiungiUtente` per inserirti nel database!')
  
 @bot.command('aggiungiUtente')
 async def aggiungiUtente(ctx):
-    image_url = get_duck_image_url()
-    await ctx.send(image_url)
-     
-      
+    id_autore = str(ctx.author.id)
+    presente = False
+    
+    with open('textPoints.txt', 'r+') as f:
+        righe = f.readlines()
+        
+        for riga in righe:
+            if id_autore in riga:
+                presente = True
+                break
+        
+        if presente:
+            await ctx.send('Sei già presente nel database!')
+        else:
+            f.write(f"{id_autore} = 0\n")
+            await ctx.send('Sei stato inserito nel database!')
+
+    
 @bot.command('duck')
 async def duck(ctx):
     image_url = get_duck_image_url()
